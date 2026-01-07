@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+    background-color: #0b3d2e;
+    color: white;
+    font-family: 'Poppins';
+}
+
+.jam {
+    font-size: 90px;
+    font-weight: bold;
+}
+
+.row-sholat {
+    font-size: 34px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.active-sholat {
+    background: #ffc107 !important;
+    color: black;
+    font-weight: bold;
+}
+
+.slide {
+    display: none;
+}
+
+.slide.active {
+    display: block;
+}
+
+.pengumuman {
+    font-size: 40px;
+    line-height: 1.5;
+} 
