@@ -1,42 +1,86 @@
 body {
   font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 .jam {
-  font-size: 4rem;
-  font-weight: bold;
-}
+   font-size: 5rem; 
+   font-weight: bold; 
+  }
 
 .row-sholat {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.8rem;
-  padding: 8px 0;
+   display: flex; 
+   justify-content: space-between; 
+   padding: 10px; 
   border-bottom: 1px solid #ddd;
-}
-
-.slide {
-  display: none;
-}
-.slide.active {
-  display: block;
-}
-
-.slide-iqomah {
-  display: none;
-}
-.slide-iqomah.active {
-  display: block;
-}
-
-
-.iqomah-time {
-  font-size: 6rem;
-  font-weight: bold;
-  color: #c00;
-}
+   font-size: 1.8rem; 
+  }
 
 .marquee {
-  font-size: 1.2rem;
-  font-weight: 500;
+   font-weight: 500; 
+   font-size: 1.5rem; 
+  }
+
+.slide, .slide-iqomah, .slide-adzan {
+   display: none; 
+   padding: 20px; 
+   width: 100%; 
+   min-height: 200px; 
+   box-sizing: border-box; }
+
+.slide.active {
+  display: block; 
 }
+
+.slide-iqomah.active, .slide-adzan.active { 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  min-height: 60vh; 
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.slide.active, .slide-iqomah.active, .slide-adzan.active {
+   animation: fadeIn 0.5s; 
+  }
+
+/* Slide Jadwal & Info */
+.slide {
+   background: #ffffff; 
+   border-radius: 10px; 
+   margin-bottom: 20px; 
+   padding: 20px; 
+   font-size: 1.8rem;
+  }
+
+/* Slide IQOMAH */
+.slide-iqomah h2 { 
+  font-size: 3rem; 
+  font-weight: 700; 
+  margin-bottom: 20px; 
+}
+
+#iqomahCountdown { 
+  font-size: 4rem; 
+  font-weight: bold; 
+  color: #000000; 
+}
+
+/* Slide ADZAN */
+.slide-adzan h2 {
+   font-size: 3rem; 
+   font-weight: 700; 
+   margin-bottom: 15px; 
+   color: #000000; 
+  }
+
+.slide-adzan p {
+   font-size: 1.5rem; 
+   font-weight: 500; 
+  }
