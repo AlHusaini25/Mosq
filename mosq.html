@@ -51,6 +51,12 @@
       <div class="slide active" id="slideJadwal">
         <div class="row justify-content-center">
           <div class="col-lg-8">
+
+            <div class="row-sholat d-flex justify-content-between" id="imsak">
+              <div>Imsak</div>
+              <div class="time">--:--</div>
+            </div>
+            
             <div class="row-sholat d-flex justify-content-between" id="subuh">
               <div>Subuh</div>
               <div class="time">--:--</div>
@@ -93,7 +99,7 @@
       </div>
 
       <div class="text-center mt-4 opacity-75 small">
-        © 2026 Masjid Al-Ikhlas RSUD Batang – Kabupaten Batang<br />
+        &copy; <span id="tahun"></span> IT RSUD BATANG - SMK SYAFI'I AKROM<br />
       </div>
     </div>
 
@@ -163,6 +169,11 @@
                 .replace(".", ":");
             }
 
+            document.querySelector("#imsak .time").innerText = sesuaikanWaktu(
+              j.imsak,
+              koreksiMenit
+            );
+            
             document.querySelector("#subuh .time").innerText = sesuaikanWaktu(
               j.subuh,
               koreksiMenit
@@ -206,6 +217,11 @@
           slides[slideIndex].classList.add("active");
         }
       }, 15000);
+
+      // Tahun Otomatis
+      const tahun = new Date().getFullYear();
+      document.getElementById("tahun").innerHTML = tahun;
+
     </script>
   </body>
 </html>
