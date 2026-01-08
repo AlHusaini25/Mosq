@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Masjid Al-Ikhlas RSUD Batang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="mosq.css">
+
+  <!-- Google Font -->
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap");
+    body { font-family: 'Poppins', sans-serif; }
+    .slide, .slide-iqomah { display: none; }
+    .slide.active, .slide-iqomah.active { display: block; }
+    .row-sholat { display: flex; justify-content: space-between; font-size: 1.2rem; padding: 5px 0; }
+    #iqomahCountdown { font-size: 3rem; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid text-center p-5">
+
+    <!-- HEADER -->
+    <h1 class="fw-bold">MASJID AL-IKHLAS</h1>
+    <h4>RSUD BATANG</h4>
+
+    <!-- TANGGAL -->
+    <div class="fs-4 mb-2" id="tanggal"></div>
+
+    <!-- JAM -->
+    <div class="jam mb-3" id="jam"></div>
+
+    <!-- MARQUEE -->
+    <div class="marquee mb-4">
+      <marquee behavior="scroll" direction="left">
+        Mohon mematikan HP • Luruskan dan rapatkan shaf • Perbanyak dzikir dan doa
+      </marquee>
+    </div>
+
+    <!-- SLIDE JADWAL -->
+    <div class="slide active" id="slideJadwal">
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
+          <div class="row-sholat" id="imsak"><span>Imsak</span><span class="time">--:--</span></div>
+          <div class="row-sholat" id="subuh"><span>Subuh</span><span class="time">--:--</span></div>
+          <div class="row-sholat" id="dzuhur"><span>Dzuhur</span><span class="time">--:--</span></div>
+          <div class="row-sholat" id="ashar"><span>Ashar</span><span class="time">--:--</span></div>
+          <div class="row-sholat" id="maghrib"><span>Maghrib</span><span class="time">--:--</span></div>
+          <div class="row-sholat" id="isya"><span>Isya</span><span class="time">--:--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE INFO -->
+    <div class="slide" id="slideInfo">
+      <p><i class="fa-solid fa-bell-slash"></i> Mohon mematikan HP</p>
+      <p><i class="fa-solid fa-mosque"></i> Luruskan dan rapatkan shaf</p>
+      <p><i class="fa-solid fa-person-praying"></i> Perbanyak dzikir dan doa</p>
+    </div>
+
+    <!-- SLIDE IQOMAH -->
+    <div class="slide-iqomah" id="slideIqomah">
+      <h2 id="judulIqomah">IQOMAH</h2>
+      <div id="iqomahCountdown">00:00</div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="text-center mt-4 opacity-75 small">
+      &copy; <span id="tahun"></span> IT RSUD BATANG - SMK SYAFI'I AKROM
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="mosq.js"></script>
+</body>
+</html>
