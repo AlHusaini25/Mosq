@@ -137,3 +137,69 @@ setInterval(()=>{
 // TAHUN 
 document.getElementById("tahun").innerHTML = new Date().getFullYear();
 
+function updateNextSholat() {
+  if (!jadwalHariIni) return;
+
+  const now = new Date();
+  let next = null;
+
+  // HAPUS highlight lama
+  document.querySelectorAll(".row-sholat").forEach(el => el.classList.remove("next"));
+
+  for (let s of ["subuh","dzuhur","ashar","maghrib","isya"]) {
+    if (!jadwalHariIni[s]) continue;
+
+    const [h, m] = jadwalHariIni[s].split(":").map(Number);
+    const waktu = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      h, m, 0
+    );
+
+    if (waktu > now) {
+      next = { nama: s, time: waktu };
+      break;
+    }
+  }
+
+  // Kalau lewat Isya → Subuh besok
+  if (!next) {
+    const [h, m] = jadwalHariIni.subuh.split(":").map(Number);
+    const besok = new Date(now);
+    besok.setDate(now.getDate() + 1);
+    besok.setHours(h, m, 0);
+    next = { nama: "subuh", time: besok };
+  }
+
+  const diff = Math.floor((next.time - now) / 1000);
+
+  const hh = String(Math.floor(diff / 3600)).padStart(2,"0");
+  const mm = String(Math.floor((diff % 3600) / 60)).padStart(2,"0");
+  const ss = String(diff % 60).padStart(2,"0");
+
+  // Update tampilan
+  document.getElementById("nextSholatNama").innerText = next.nama.toUpperCase();
+  document.getElementById("nextSholatTime").innerText =
+    next.time.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("nextSholatCountdown").innerText =
+    `${hh}:${mm}:${ss}`;
+
+  // Highlight row sholat
+  const row = document.getElementById(next.nama);
+  if (row) row.classList.add("next");
+
+  // Countdown merah < 10 menit
+  const cd = document.getElementById("nextSholatCountdown");
+  if (diff <= 600) {
+    cd.classList.add("countdown-warning");
+  } else {
+    cd.classList.remove("countdown-warning");
+  }
+
+  if (diff > 60) beepPlayed = false;
+}
+
+setInterval(updateNextSholat, 1000);
+
+
