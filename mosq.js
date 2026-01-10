@@ -196,8 +196,6 @@ function updateNextSholat() {
   } else {
     cd.classList.remove("countdown-warning");
   }
-
-  if (diff > 60) beepPlayed = false;
 }
 
 setInterval(updateNextSholat, 1000);
