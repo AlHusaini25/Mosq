@@ -21,7 +21,7 @@ body {
   display: flex;
   justify-content: space-between;
   padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #a1a1a1;
   font-size: clamp(1.2rem, 2.5vw, 1.6rem);
 }
 
@@ -59,8 +59,12 @@ body {
 
 /* ANIMASI */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .slide.active,
@@ -88,7 +92,7 @@ body {
 #iqomahCountdown {
   font-size: clamp(3rem, 6vw, 4rem);
   font-weight: bold;
-  color: #000;
+  color: #a1a1a1;
 }
 
 /* =====================
@@ -125,7 +129,9 @@ body {
 }
 
 @keyframes blink {
-  50% { opacity: 0.5; }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* HIGHLIGHT SHOLAT BERIKUTNYA */
@@ -159,7 +165,7 @@ body {
   padding: 8px 20px;
   font-size: clamp(0.9rem, 1.8vw, 1.1rem);
   opacity: 0.9;
-  margin-top: auto;  
+  margin-top: auto;
 }
 
 .footer-fixed marquee {
