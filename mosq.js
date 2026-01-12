@@ -218,7 +218,9 @@ function updateNextSholat() {
 
   // Countdown merah < 10 menit
   const cd = document.getElementById("nextSholatCountdown");
-  if (diff <= 600) {
+  if (diff <= 600 && diff > 0) {
+    cd.classList.remove("countdown-warning"); 
+    void cd.offsetWidth;
     cd.classList.add("countdown-warning");
   } else {
     cd.classList.remove("countdown-warning");
