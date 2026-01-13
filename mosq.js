@@ -195,7 +195,8 @@ function updateNextSholat() {
     next = { nama: "subuh", time: besok };
   }
   
-  // const diff = 30; 
+  // const diff = 30; // bakal test
+  
 
   const diff = Math.floor((next.time - now) / 1000);
 
@@ -220,7 +221,7 @@ function updateNextSholat() {
 
   // Countdown merah < 10 menit
   const cd = document.getElementById("nextSholatCountdown");
-  if (diff <= 600 && diff > 0) {
+  if (diff <= 60 && diff > 0) {
     cd.classList.remove("countdown-warning"); 
     void cd.offsetWidth;
     cd.classList.add("countdown-warning");

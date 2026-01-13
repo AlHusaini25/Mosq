@@ -80,9 +80,7 @@ body {
   font-size: clamp(1.2rem, 2.5vw, 1.6rem);
 }
 
-/* =====================
-   SLIDE IQOMAH
-===================== */
+/* SLIDE IQOMAH */
 .slide-iqomah h2 {
   font-size: clamp(2rem, 4vw, 2.6rem);
   font-weight: 700;
@@ -95,9 +93,7 @@ body {
   color: #a1a1a1;
 }
 
-/* =====================
-   SLIDE ADZAN
-===================== */
+/*  SLIDE ADZAN */
 .slide-adzan h2 {
   font-size: clamp(1.8rem, 4vw, 2.4rem);
   font-weight: 700;
