@@ -194,6 +194,8 @@ function updateNextSholat() {
     besok.setHours(h, m, 0);
     next = { nama: "subuh", time: besok };
   }
+  
+  // const diff = 30; 
 
   const diff = Math.floor((next.time - now) / 1000);
 
