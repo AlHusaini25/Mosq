@@ -12,8 +12,8 @@ body {
 
 /* JAM UTAMA */
 .jam {
-  font-size: clamp(3rem, 7vw, 4.5rem);
-  font-weight: 700;
+  font-size: 5.5rem;
+  letter-spacing: 2px;
 }
 
 /* ROW JADWAL SHOLAT */
@@ -70,7 +70,7 @@ body {
 .slide.active,
 .slide-iqomah.active,
 .slide-adzan.active {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 /* SLIDE JADWAL */
@@ -174,4 +174,17 @@ body {
   font-size: 0.8rem;
   opacity: 0.7;
   text-align: center;
+}
+
+.fade-soft {
+  animation: fadeSoft 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeSoft {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
 }
