@@ -10,13 +10,258 @@ body {
   text-align: center;
 }
 
-/* JAM UTAMA */
-.jam {
-  font-size: 5.5rem;
-  letter-spacing: 2px;
+/* HEADER SECTION - 3 Kolom Layout */
+.header-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-/* ROW JADWAL SHOLAT */
+@media (max-width: 768px) {
+  .header-section {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .header-left,
+  .header-right {
+    text-align: center;
+  }
+
+  .prayer-times-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .prayer-box {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* KOLOM KIRI: Jam & Countdown Iqomah */
+.header-left {
+  text-align: left;
+}
+
+.current-time {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 2px;
+  border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  
+  .menuju-iqomah {
+    color: red;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .countdown-iqomah {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 1px;
+    min-height: 3rem;
+  }
+  
+  .countdown-iqomah:empty {
+    display: none;
+  }
+  
+  /* KOLOM TENGAH: Nama Masjid */
+  .header-center {
+    text-align: center;
+  }
+  
+  .masjid-name {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+  }
+  
+  .masjid-location {
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+  }
+  
+  /* KOLOM KANAN: Tanggal */
+  .header-right {
+    text-align: right;
+  }
+  
+  .tanggal-section {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .tanggal-section::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: #000;
+    margin-top: 5px;
+  }
+  
+  /* PANEL TENGAH DENGAN ILUSTRASI */
+  .central-panel {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    background: #e0f7fa;
+    border: 2px solid #00bcd4;
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .landscape-illustration {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background: linear-gradient(to bottom, #b3e5fc 0%, #81d4fa 100%);
+  }
+  
+  .cloud {
+    position: absolute;
+    background: #fff;
+    border-radius: 50px;
+    opacity: 0.8;
+  }
+  
+  .cloud1 {
+    width: 80px;
+    height: 40px;
+    top: 30px;
+    left: 15%;
+    box-shadow: 60px 0 0 -10px #fff, 30px -20px 0 -5px #fff;
+  }
+  
+  .cloud2 {
+    width: 60px;
+    height: 30px;
+    top: 50px;
+    right: 20%;
+    box-shadow: 50px 0 0 -8px #fff, 25px -15px 0 -4px #fff;
+  }
+  
+  .hills {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+}
+
+.hill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.hill-back {
+  height: 60%;
+  background: #a5d6a7;
+  clip-path: polygon(0 100%, 0 40%, 20% 30%, 40% 35%, 60% 25%, 80% 30%, 100% 25%, 100% 100%);
+}
+
+.hill-front {
+  height: 100%;
+  background: #66bb6a;
+  clip-path: polygon(0 100%, 0 60%, 15% 50%, 30% 55%, 50% 45%, 70% 50%, 85% 45%, 100% 50%, 100% 100%);
+}
+
+.panel-message {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px 20px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #333;
+  text-align: left;
+  font-weight: 500;
+}
+
+/* KOTAK WAKTU SHOLAT HORIZONTAL */
+.prayer-times-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.prayer-box {
+  flex: 1;
+  min-width: 120px;
+  max-width: 180px;
+  background: #c8e6c9;
+  border-radius: 12px;
+  padding: 15px 10px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.prayer-box:hover {
+  transform: translateY(-2px);
+}
+
+.prayer-label {
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.prayer-time {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #000;
+}
+
+/* HIGHLIGHT SHOLAT AKTIF (seperti Dhuhur di gambar) */
+.prayer-box.active {
+  background: #9c27b0;
+}
+
+.prayer-box.active .prayer-label,
+.prayer-box.active .prayer-time {
+  color: #fff;
+}
+
+/* ROW JADWAL SHOLAT (untuk kompatibilitas) */
 .row-sholat {
   display: flex;
   justify-content: space-between;
@@ -140,6 +385,14 @@ body {
   border-radius: 8px;
 }
 
+.prayer-box.next {
+  background: #000;
+}
+
+.prayer-box.next .prayer-label,
+.prayer-box.next .prayer-time {
+  color: #fff;
+}
 /* PAGE */
 .page {
   min-height: 100vh;

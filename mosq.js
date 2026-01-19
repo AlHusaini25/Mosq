@@ -27,11 +27,23 @@ let slideInterval = null;
 //  JAM REALTIME
 function updateJam() {
   const now = new Date();
-  document.getElementById("jam").innerHTML = now.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  const jamElement = document.getElementById("jam");
+  if (jamElement) {
+    jamElement.innerHTML = now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
+  
+  // Update jam di header (tanpa detik)
+  const currentTimeElement = document.querySelector(".current-time");
+  if (currentTimeElement) {
+    currentTimeElement.innerHTML = now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 }
 setInterval(updateJam, 1000);
 updateJam();
@@ -48,7 +60,10 @@ function updateTanggal() {
         year: "numeric",
       });
       const hijri = `${h.data.hijri.day} ${h.data.hijri.month.en} ${h.data.hijri.year} H`;
-      document.getElementById("tanggal").innerHTML = `${masehi} | ${hijri}`;
+      const tanggalElement = document.getElementById("tanggal");
+      if (tanggalElement) {
+        tanggalElement.innerHTML = `${masehi}<br>${hijri}`;
+      }
     });
 }
 updateTanggal();
@@ -67,8 +82,13 @@ async function ambilJadwal() {
   if (data.status) {
     jadwalHariIni = data.data.jadwal;
     for (const key in jadwalHariIni) {
-      const el = document.querySelector(`#${key} .time`);
-      if (el) el.innerText = jadwalHariIni[key];
+      // Update untuk layout lama (jika ada)
+      const elOld = document.querySelector(`#${key} .time`);
+      if (elOld) elOld.innerText = jadwalHariIni[key];
+      
+      // Update untuk layout baru (kotak horizontal)
+      const elNew = document.querySelector(`#${key} .prayer-time`);
+      if (elNew) elNew.innerText = jadwalHariIni[key];
     }
   }
 }
@@ -77,14 +97,15 @@ setInterval(ambilJadwal, 3600000);
 
 //  SLIDE UTAMA OTOMATIS
 const slides = [
-  document.getElementById("slideJadwal"),
   document.getElementById("slideInfo"),
 ];
 let currentSlide = 0;
 
 function showSlide(index) {
-  slides.forEach((s) => s.classList.remove("active"));
-  slides[index].classList.add("active");
+  slides.forEach((s) => {
+    if (s) s.classList.remove("active");
+  });
+  if (slides[index]) slides[index].classList.add("active");
 }
 function startSlideshow() {
   slideInterval = setInterval(() => {
@@ -95,7 +116,8 @@ function startSlideshow() {
 function stopSlideshow() {
   clearInterval(slideInterval);
 }
-startSlideshow();
+// Jangan start slideshow otomatis, karena slideJadwal sekarang selalu terlihat
+// startSlideshow();
 
 //  HELPER
 function formatWaktu(detik) {
@@ -109,25 +131,24 @@ function tampilkanSlide(id) {
   document
     .querySelectorAll(".slide, .slide-iqomah, .slide-adzan")
     .forEach((s) => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  const slide = document.getElementById(id);
+  if (slide) slide.classList.add("active");
+  
+  // Reset countdown header jika bukan slide iqomah
+  if (id !== "slideIqomah") {
+    const elHeader = document.getElementById("countdownIqomahHeader");
+    if (elHeader) elHeader.innerHTML = "00:00";
+  }
 }
 
 function tampilkanAdzan(sholat) {
-  stopBeep(); // ⬅️ TAMBAHAN
+  stopBeep();
   stopSlideshow();
   tampilkanSlide("slideAdzan");
 
   document.getElementById("judulAdzan").innerHTML =
     "ADZAN " + sholat.toUpperCase();
 
-  setTimeout(() => {
-    mulaiIqomah(sholat);
-  }, 15000);
-
-  stopSlideshow();
-  tampilkanSlide("slideAdzan");
-  document.getElementById("judulAdzan").innerHTML =
-    "ADZAN " + sholat.toUpperCase();
   setTimeout(() => {
     mulaiIqomah(sholat);
   }, 15000); // 15 detik adzan
@@ -142,16 +163,20 @@ function mulaiIqomah(sholat) {
 
   let sisaDetik = menit * 60;
   const el = document.getElementById("iqomahCountdown");
+  const elHeader = document.getElementById("countdownIqomahHeader");
   document.getElementById("judulIqomah").innerHTML =
     "IQOMAH " + sholat.toUpperCase();
 
   clearInterval(iqomahTimer);
   iqomahTimer = setInterval(() => {
-    el.innerHTML = formatWaktu(sisaDetik);
+    const waktuFormat = formatWaktu(sisaDetik);
+    if (el) el.innerHTML = waktuFormat;
+    if (elHeader) elHeader.innerHTML = waktuFormat;
 
     if (sisaDetik <= 0) {
       clearInterval(iqomahTimer);
-      el.innerHTML = "SHALAT DIMULAI";
+      if (el) el.innerHTML = "SHALAT DIMULAI";
+      if (elHeader) elHeader.innerHTML = "00:00";
 
       // Setelah 1 menit, langsung kembalikan ke slideshow utama
       setTimeout(() => {
@@ -164,6 +189,9 @@ function mulaiIqomah(sholat) {
 
         // START SLIDE UTAMA
         startSlideshow();
+        
+        // Reset countdown header
+        if (elHeader) elHeader.innerHTML = "00:00";
       }, 60000);
     }
 
@@ -198,6 +226,51 @@ function updateNextSholat() {
   document
     .querySelectorAll(".row-sholat")
     .forEach((el) => el.classList.remove("next"));
+  document
+    .querySelectorAll(".prayer-box")
+    .forEach((el) => el.classList.remove("next", "active"));
+
+  // Tentukan sholat aktif berdasarkan waktu sekarang
+  const nowTime = now.getHours() * 60 + now.getMinutes();
+  let activeSholat = null;
+  const sholatOrder = ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"];
+  
+  for (let i = 0; i < sholatOrder.length; i++) {
+    const s = sholatOrder[i];
+    if (!jadwalHariIni[s]) continue;
+    
+    const [h, m] = jadwalHariIni[s].split(":").map(Number);
+    const waktuSholat = h * 60 + m;
+    
+    // Cek sholat berikutnya
+    let waktuSholatNext = null;
+    if (i < sholatOrder.length - 1) {
+      const sNext = sholatOrder[i + 1];
+      if (jadwalHariIni[sNext]) {
+        const [hNext, mNext] = jadwalHariIni[sNext].split(":").map(Number);
+        waktuSholatNext = hNext * 60 + mNext;
+      }
+    } else {
+      // Jika isya, sholat berikutnya adalah imsak besok
+      const sNext = sholatOrder[0];
+      if (jadwalHariIni[sNext]) {
+        const [hNext, mNext] = jadwalHariIni[sNext].split(":").map(Number);
+        waktuSholatNext = (hNext + 24) * 60 + mNext; // +24 jam untuk besok
+      }
+    }
+    
+    // Jika waktu sekarang >= waktu sholat ini dan < waktu sholat berikutnya
+    if (waktuSholat <= nowTime && (waktuSholatNext === null || nowTime < waktuSholatNext)) {
+      activeSholat = s;
+      break;
+    }
+  }
+  
+  // Highlight sholat aktif
+  if (activeSholat) {
+    const activeBox = document.getElementById(activeSholat);
+    if (activeBox) activeBox.classList.add("active");
+  }
 
   for (let s of ["subuh", "dzuhur", "ashar", "maghrib", "isya"]) {
     if (!jadwalHariIni[s]) continue;
@@ -247,9 +320,15 @@ function updateNextSholat() {
     "nextSholatCountdown"
   ).innerText = `${hh}:${mm}:${ss}`;
 
-  // Highlight row sholat
+  // Highlight row sholat (layout lama)
   const row = document.getElementById(next.nama);
   if (row) row.classList.add("next");
+  
+  // Highlight kotak sholat (layout baru) - hanya jika bukan sholat aktif
+  if (!activeSholat || activeSholat !== next.nama) {
+    const prayerBox = document.getElementById(next.nama);
+    if (prayerBox) prayerBox.classList.add("next");
+  }
 
   // Countdown merah < 10 menit
   const cd = document.getElementById("nextSholatCountdown");
