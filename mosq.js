@@ -1,3 +1,24 @@
+// BEEP SETTINGS
+
+const beepAudio = document.getElementById("beepAudio");
+beepAudio.volume = 0.7;
+
+let beepInterval = null;
+
+function startBeep () {
+  if (beepInterval) return;
+
+  beepInterval = setInterval(() => {
+    beepAudio.currentTime = 0;
+    beepAudio.play().catch(() => {});
+  }, 3000 );  //bunyi tiap 3 detik
+}
+
+function stopBeep() {
+  clearInterval(beepInterval);
+  beepInterval = null;
+}
+
 //  SETTINGS
 const iqomahSetting = { subuh: 0.1, dzuhur: 8, ashar: 8, maghrib: 5, isya: 8 };
 let iqomahTimer = null;
@@ -92,6 +113,17 @@ function tampilkanSlide(id) {
 }
 
 function tampilkanAdzan(sholat) {
+  stopBeep(); // ⬅️ TAMBAHAN
+  stopSlideshow();
+  tampilkanSlide("slideAdzan");
+
+  document.getElementById("judulAdzan").innerHTML =
+    "ADZAN " + sholat.toUpperCase();
+
+  setTimeout(() => {
+    mulaiIqomah(sholat);
+  }, 15000);
+
   stopSlideshow();
   tampilkanSlide("slideAdzan");
   document.getElementById("judulAdzan").innerHTML =
@@ -228,6 +260,14 @@ function updateNextSholat() {
   } else {
     cd.classList.remove("countdown-warning");
   }
+
+  // BEEP 1 MENIT SEBELUM ADZAN
+if (diff <= 60 && diff > 0) {
+  startBeep();
+} else {
+  stopBeep();
+}
+
 }
 
 setInterval(updateNextSholat, 1000);
