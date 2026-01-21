@@ -248,17 +248,7 @@ body {
 .prayer-time {
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 700;
-  color: #000;
-}
-
-/* HIGHLIGHT SHOLAT AKTIF (seperti Dhuhur di gambar) */
-.prayer-box.active {
-  background: #9c27b0;
-}
-
-.prayer-box.active .prayer-label,
-.prayer-box.active .prayer-time {
-  color: #fff;
+  color: #000000;
 }
 
 /* ROW JADWAL SHOLAT (untuk kompatibilitas) */
@@ -386,8 +376,13 @@ body {
 }
 
 .prayer-box.next {
-  background: #000;
+  background: #af1da8; /* orange */
+  color: #fff;
+  font-weight: 700;
+  transform: scale(1.05);
+  transition: all 0.3s;
 }
+
 
 .prayer-box.next .prayer-label,
 .prayer-box.next .prayer-time {
@@ -440,4 +435,32 @@ body {
   100% {
     opacity: 1;
   }
+}
+
+.blink-red {
+  color: #ff3b3b;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1 }
+  50% { opacity: 0.2 }
+  100% { opacity: 1 }
+}
+
+/* ================= JUMAT HIGHLIGHT ================= */
+.prayer-box.jumat {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+}
+
+.prayer-box.jumat .prayer-label {
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* Supaya tetap kontras */
+.prayer-box.jumat .prayer-time {
+  font-size: 1.6em;
 }
