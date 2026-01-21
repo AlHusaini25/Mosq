@@ -4,12 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (beepAudio) beepAudio.volume = 0.7;
   let beepInterval = null;
 
-  // ===== TEST ADZAN MANUAL =====
-window.testAdzan = function(sholat) {
-  // langsung tampilkan adzan
+ 
+  window.testAdzan = function (sholat) {
   tampilkanAdzan(sholat);
-};
-
+  };
 
   function startBeep() {
     if (beepInterval) return;
@@ -30,6 +28,7 @@ window.testAdzan = function(sholat) {
     document.getElementById("jam").innerText = now.toLocaleTimeString("id-ID", {
       hour: "2-digit",
       minute: "2-digit",
+
     });
   }
   setInterval(updateJam, 1000);
@@ -69,20 +68,27 @@ window.testAdzan = function(sholat) {
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const t = String(d.getDate()).padStart(2, "0");
 
-    const res = await fetch(
-      `https://api.myquran.com/v2/sholat/jadwal/1403/${y}/${m}/${t}`,
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.myquran.com/v2/sholat/jadwal/1403/${y}/${m}/${t}`,
+      );
+      const data = await res.json();
 
-    if (data.status) {
-      jadwalHariIni = data.data.jadwal;
-      ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"].forEach((s) => {
-        document.querySelector(`#${s} .prayer-time`).innerText =
-          jadwalHariIni[s];
-      });
+      if (data.status) {
+        jadwalHariIni = data.data.jadwal;
+        const urutan = ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"];
+
+        urutan.forEach((s) => {
+          const elCard = document.querySelector(`#${s} h3`);
+          if (elCard) {
+            elCard.innerText = jadwalHariIni[s];
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Gagal mengambil jadwal:", error);
     }
   }
-
   ambilJadwal();
   setInterval(ambilJadwal, 3600000);
 
@@ -91,63 +97,64 @@ window.testAdzan = function(sholat) {
     adzanAktif = true;
     stopBeep();
 
-    document.getElementById("slideAdzan").classList.add("active");
+    // Tampilkan Overlay Adzan di dalam kartu biru
+    document.getElementById("slideAdzan").style.display = "block";
     document.getElementById("judulAdzan").innerText =
       "ADZAN " + sholat.toUpperCase();
 
+    // Sembunyikan countdown normal di kiri
+    document.getElementById("normalCountdown").style.display = "none";
+
     setTimeout(() => {
-      document.getElementById("slideAdzan").classList.remove("active");
+      document.getElementById("slideAdzan").style.display = "none";
       mulaiIqomah(sholat);
-    }, 15000);
+    }, 15000); // 15 detik tampilan adzan
   }
 
   /* ================= IQOMAH ================= */
   function mulaiIqomah(sholat) {
     mode = "iqomah";
-    iqomahTarget = new Date(Date.now() + IQOMAH[sholat] * 60000);
+    
+    const menit = IQOMAH[sholat] || 10; 
 
-    document.getElementById("nextSholatNama").innerText = "MENUJU IQOMAH";
-    document.getElementById("nextSholatTime").innerText = "";
-  }
+    iqomahTarget = new Date(Date.now() + menit * 60000);
 
-  function selesaiIqomah() {
-    mode = "adzan";
-    adzanAktif = false;
-    iqomahTarget = null;
-
-    document.getElementById("nextSholatNama").innerText = "-";
-    document.getElementById("nextSholatCountdown").innerText = "00:00:00";
-  }
+    document.getElementById("iqomahSection").style.display = "block";
+    document.getElementById("normalCountdown").style.display = "none";
+}
 
   /* ================= COUNTDOWN ================= */
+
   function updateCountdown() {
     const now = new Date();
+    const cdNormal = document.getElementById("countdownTimer");
+   const cdIqomah = document.getElementById("nextSholatCountdown");
 
-    /* ===== MODE IQOMAH ===== */
     if (mode === "iqomah") {
-      let diff = Math.floor((iqomahTarget - now) / 1000);
-      diff = Math.max(0, diff);
+        // Hitung selisih waktu antara sekarang dan waktu target iqomah
+        let diff = Math.floor((iqomahTarget - now) / 1000);
+        diff = Math.max(0, diff); 
+        if (cdIqomah) {
+            const m = String(Math.floor(diff / 60)).padStart(2, '0');
+            const s = String(diff % 60).padStart(2, '0');
+            cdIqomah.innerText = `${m} : ${s}`;
 
-      const cd = document.getElementById("nextSholatCountdown");
-      cd.innerText = new Date(diff * 1000).toISOString().substr(11, 8);
+            // kedip merah jika waktu sisa kurang dari 1 menit
+            cdIqomah.classList.toggle("blink-red", diff <= 60);
+        }
 
-      cd.classList.toggle("blink-red", diff <= 60);
-
-      if (diff === 0) selesaiIqomah();
-      return;
+        if (diff <= 0) {
+            selesaiIqomah();
+        }
+        return; 
     }
 
-    /* ===== MODE ADZAN ===== */
+    /* ===== MODE ADZAN (NORMAL) ===== */
     if (!jadwalHariIni.subuh || adzanAktif) return;
 
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const urutan = ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"];
     let next = "subuh";
-
-    // Hapus highlight sebelumnya
-    document.querySelectorAll(".prayer-box").forEach((el) => {
-      el.classList.remove("next");
-    });
 
     // Tentukan sholat berikutnya
     for (let s of urutan) {
@@ -158,28 +165,32 @@ window.testAdzan = function(sholat) {
       }
     }
 
-    // Tambahkan highlight pada kotak sholat berikutnya
+    document.querySelectorAll(".prayer-card").forEach((el) => {
+      el.classList.remove("next");
+    });
+
     const boxNext = document.getElementById(next);
-    if (boxNext) boxNext.classList.add("next");
+    if (boxNext) {
+      boxNext.classList.add("next");
+    }
 
     const [nh, nm] = jadwalHariIni[next].split(":").map(Number);
     let target = new Date();
-    target.setHours(nh, nm, 0);
-    if (next === "subuh" && nowMin > 1200) target.setDate(target.getDate() + 1);
+    target.setHours(nh, nm, 0, 0);
+
+    if (next === "subuh" && nowMin > nh * 60 + nm) {
+      target.setDate(target.getDate() + 1);
+    }
 
     let diff = Math.max(0, Math.floor((target - now) / 1000));
 
-    document.getElementById("nextSholatNama").innerText = next.toUpperCase();
-    document.getElementById("nextSholatTime").innerText =
-      target.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    document.getElementById("nextSholatCountdown").innerText = new Date(
-      diff * 1000,
-    )
-      .toISOString()
-      .substr(11, 8);
+    if (cdNormal) {
+      cdNormal.innerText = new Date(diff * 1000).toISOString().substr(11, 8);
+      cdNormal.classList.toggle("blink-red", diff <= 60);
+    }
+
+    const elNama = document.getElementById("nextSholatNama");
+    if (elNama) elNama.innerText = "MENUJU " + next.toUpperCase();
 
     if (diff <= 60 && diff > 0) startBeep();
     else stopBeep();
@@ -220,14 +231,4 @@ window.testAdzan = function(sholat) {
 
   setInterval(updateJumatMode, 60000);
   updateJumatMode();
-  // ===== TEST ADZAN MANUAL =====
-  function testAdzan(sholat) {
-    // langsung tampilkan adzan
-    tampilkanAdzan(sholat);
-  }
-  
-  // Contoh pemakaian:
-  // testAdzan("subuh");  // akan langsung tampil adzan Subuh + mulai iqomah
-  // testAdzan("dzuhur"); // langsung adzan Dzuhur
 });
-
