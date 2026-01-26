@@ -1,0 +1,24 @@
+<script>
+    if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
+        window.location.href = 'login.html';
+    }
+
+    function logout() {
+        localStorage.removeItem('isAdminLoggedIn');
+        window.location.href = 'login.html';
+    }
+</script>
+
+<div class="container mt-5">
+    <h2>Panel Pengaturan Masjid</h2>
+    <hr>
+    <div class="card p-4">
+        <h5>Pengaturan Waktu Iqomah (Menit)</h5>
+        <div class="row">
+            <div class="col"><label>Subuh</label><input type="number" class="form-control" value="10"></div>
+            <div class="col"><label>Dzuhur</label><input type="number" class="form-control" value="10"></div>
+            </div>
+        <button class="btn btn-success mt-3">Simpan Perubahan</button>
+        <button onclick="logout()" class="btn btn-link text-danger mt-2">Keluar</button>
+    </div>
+</div>
