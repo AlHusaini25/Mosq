@@ -1,26 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
   /* ================= AUDIO ================= */
   const beepAudio = document.getElementById("beepAudio");
-  if (beepAudio) beepAudio.volume = 0.7;
+  beepAudio.volume = 0.7;
+
   let beepInterval = null;
 
- 
-  window.testAdzan = function (sholat) {
-  tampilkanAdzan(sholat);
-  };
-
   function startBeep() {
-    if (beepInterval) return;
+    if (beepInterval) return; // sudah bunyi, jangan dobel
+
     beepInterval = setInterval(() => {
       beepAudio.currentTime = 0;
-      beepAudio.play().catch(() => {});
-    }, 3000);
+      beepAudio.play().catch(() => { });
+    }, 2500); // beep tiap 2.5 detik
   }
 
   function stopBeep() {
-    clearInterval(beepInterval);
-    beepInterval = null;
+    if (beepInterval) {
+      clearInterval(beepInterval);
+      beepInterval = null;
+    }
   }
+
+
+  window.testAdzan = function (sholat) {
+    tampilkanAdzan(sholat);
+  };
+
 
   /* ================= JAM ================= */
   function updateJam() {
@@ -114,39 +119,44 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= IQOMAH ================= */
   function mulaiIqomah(sholat) {
     mode = "iqomah";
-    
-    const menit = IQOMAH[sholat] || 10; 
+
+    const menit = IQOMAH[sholat] || 10;
 
     iqomahTarget = new Date(Date.now() + menit * 60000);
 
     document.getElementById("iqomahSection").style.display = "block";
     document.getElementById("normalCountdown").style.display = "none";
-}
+  }
 
   /* ================= COUNTDOWN ================= */
 
   function updateCountdown() {
     const now = new Date();
     const cdNormal = document.getElementById("countdownTimer");
-   const cdIqomah = document.getElementById("nextSholatCountdown");
+    const cdIqomah = document.getElementById("nextSholatCountdown");
 
     if (mode === "iqomah") {
-        // Hitung selisih waktu antara sekarang dan waktu target iqomah
-        let diff = Math.floor((iqomahTarget - now) / 1000);
-        diff = Math.max(0, diff); 
-        if (cdIqomah) {
-            const m = String(Math.floor(diff / 60)).padStart(2, '0');
-            const s = String(diff % 60).padStart(2, '0');
-            cdIqomah.innerText = `${m} : ${s}`;
+      let diff = Math.floor((iqomahTarget - now) / 1000);
+      diff = Math.max(0, diff);
 
-            // kedip merah jika waktu sisa kurang dari 1 menit
-            cdIqomah.classList.toggle("blink-red", diff <= 60);
-        }
+      const m = String(Math.floor(diff / 60)).padStart(2, "0");
+      const s = String(diff % 60).padStart(2, "0");
+      cdIqomah.innerText = `${m}:${s}`;
 
-        if (diff <= 0) {
-            selesaiIqomah();
-        }
-        return; 
+      cdIqomah.classList.toggle("blink-red", diff <= 60);
+
+      // 🔔 BEEP IQOMAH (10 DETIK TERAKHIR)
+      if (diff <= 10 && diff > 0) {
+        startBeep();
+      } else {
+        stopBeep();
+      }
+
+      if (diff === 0) {
+        stopBeep();
+        selesaiIqomah();
+      }
+      return;
     }
 
     /* ===== MODE ADZAN (NORMAL) ===== */
@@ -200,6 +210,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(updateCountdown, 1000);
 
+  function selesaiIqomah() {
+    stopBeep();
+    mode = "adzan";
+    adzanAktif = false;
+    document.getElementById("iqomahSection").style.display = "none";
+    document.getElementById("normalCountdown").style.display = "block";
+  }
+
+
   /* ================= JUMAT MODE ================= */
   function updateJumatMode() {
     const now = new Date();
@@ -231,4 +250,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(updateJumatMode, 60000);
   updateJumatMode();
+
+  const pesan = [
+    "Matikan / silent HP sebelum sholat",
+    "Luruskan shaf dan rapatkan barisan",
+    "Perbanyak sholawat kepada Nabi ﷺ",
+    "Datang lebih awal, pahalanya lebih besar",
+    "Sholat berjamaah lebih utama 27 derajat",
+  ];
+
+  let pesanIndex = 0;
+  setInterval(() => {
+    const marquee = document.getElementById("marqueeText");
+    if (marquee) {
+      marquee.innerText = pesan[pesanIndex];
+      pesanIndex = (pesanIndex + 1) % pesan.length;
+    }
+  }, 30000);
+
 });
