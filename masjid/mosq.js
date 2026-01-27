@@ -5,21 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let beepInterval = null;
 
-  function startBeep() {
-    if (beepInterval) return; // sudah bunyi, jangan dobel
-
+  function beepStart() {
+    if (beepInterval) return;
     beepInterval = setInterval(() => {
       beepAudio.currentTime = 0;
       beepAudio.play().catch(() => { });
-    }, 2500); // beep tiap 2.5 detik
+    }, 2500);
   }
 
-  function stopBeep() {
-    if (beepInterval) {
-      clearInterval(beepInterval);
-      beepInterval = null;
-    }
+  function beepStop() {
+    clearInterval(beepInterval);
+    beepInterval = null;
   }
+
 
 
   window.testAdzan = function (sholat) {
@@ -55,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= JADWAL SHOLAT ================= */
   let jadwalHariIni = {};
-  let mode = "adzan"; // adzan | iqomah
+  let mode = "NORMAL"; // normal | adzan | iqomah
   let adzanAktif = false;
   let iqomahTarget = null;
 
@@ -99,8 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= ADZAN ================= */
   function tampilkanAdzan(sholat) {
+    mode = "ADZAN";
     adzanAktif = true;
-    stopBeep();
+    beepStop();
 
     // Tampilkan Overlay Adzan di dalam kartu biru
     document.getElementById("slideAdzan").style.display = "block";
@@ -109,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Sembunyikan countdown normal di kiri
     document.getElementById("normalCountdown").style.display = "none";
+    document.getElementById("iqomahSection").style.display = "none";
+
+    highlightActive(sholat);
 
     setTimeout(() => {
       document.getElementById("slideAdzan").style.display = "none";
@@ -116,12 +118,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 15000); // 15 detik tampilan adzan
   }
 
+  function highlightActive(sholat) {
+    document.querySelectorAll(".prayer-card").forEach(el => {
+      el.classList.remove("next", "active");
+    });
+
+    const el = document.getElementById(sholat);
+    if (el) el.classList.add("active");
+  }
+
+
   /* ================= IQOMAH ================= */
   function mulaiIqomah(sholat) {
-    mode = "iqomah";
+    mode = "IQOMAH";
 
     const menit = IQOMAH[sholat] || 10;
-
     iqomahTarget = new Date(Date.now() + menit * 60000);
 
     document.getElementById("iqomahSection").style.display = "block";
@@ -129,81 +140,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ================= COUNTDOWN ================= */
-
   function updateCountdown() {
     const now = new Date();
-    const cdNormal = document.getElementById("countdownTimer");
-    const cdIqomah = document.getElementById("nextSholatCountdown");
 
-    if (mode === "iqomah") {
-      let diff = Math.floor((iqomahTarget - now) / 1000);
-      diff = Math.max(0, diff);
+    /* ===== IQOMAH ===== */
+    if (mode === "IQOMAH") {
+      let diff = Math.max(0, Math.floor((iqomahTarget - now) / 1000));
 
       const m = String(Math.floor(diff / 60)).padStart(2, "0");
       const s = String(diff % 60).padStart(2, "0");
-      cdIqomah.innerText = `${m}:${s}`;
+      document.getElementById("nextSholatCountdown").innerText = `${m}:${s}`;
 
-      cdIqomah.classList.toggle("blink-red", diff <= 60);
+      diff <= 10 && diff > 0 ? beepStart() : beepStop();
 
-      // 🔔 BEEP IQOMAH (10 DETIK TERAKHIR)
-      if (diff <= 10 && diff > 0) {
-        startBeep();
-      } else {
-        stopBeep();
-      }
-
-      if (diff === 0) {
-        stopBeep();
-        selesaiIqomah();
-      }
+      if (diff === 0) selesaiIqomah();
       return;
     }
 
-    /* ===== MODE ADZAN (NORMAL) ===== */
-    if (!jadwalHariIni.subuh || adzanAktif) return;
+    /* ===== NORMAL ===== */
+    if (!jadwalHariIni.subuh || mode !== "NORMAL") return;
 
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const urutan = ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"];
-    let next = "subuh";
 
-    // Tentukan sholat berikutnya
-    for (let s of urutan) {
+    let next = urutan.find(s => {
       const [h, m] = jadwalHariIni[s].split(":").map(Number);
-      if (nowMin < h * 60 + m) {
-        next = s;
-        break;
-      }
-    }
+      return nowMin < h * 60 + m;
+    }) || "subuh";
 
-    document.querySelectorAll(".prayer-card").forEach((el) => {
+    document.querySelectorAll(".prayer-card").forEach(el => {
       el.classList.remove("next");
     });
 
-    const boxNext = document.getElementById(next);
-    if (boxNext) {
-      boxNext.classList.add("next");
-    }
+    document.getElementById(next)?.classList.add("next");
 
     const [nh, nm] = jadwalHariIni[next].split(":").map(Number);
-    let target = new Date();
+    const target = new Date();
     target.setHours(nh, nm, 0, 0);
-
-    if (next === "subuh" && nowMin > nh * 60 + nm) {
-      target.setDate(target.getDate() + 1);
-    }
 
     let diff = Math.max(0, Math.floor((target - now) / 1000));
 
-    if (cdNormal) {
-      cdNormal.innerText = new Date(diff * 1000).toISOString().substr(11, 8);
-      cdNormal.classList.toggle("blink-red", diff <= 60);
-    }
+    document.getElementById("countdownTimer").innerText =
+      new Date(diff * 1000).toISOString().substr(11, 8);
 
-    const elNama = document.getElementById("nextSholatNama");
-    if (elNama) elNama.innerText = "MENUJU " + next.toUpperCase();
+    document.getElementById("nextSholatNama").innerText =
+      "MENUJU " + next.toUpperCase();
 
-    if (diff <= 60 && diff > 0) startBeep();
-    else stopBeep();
+    diff <= 60 && diff > 0 ? beepStart() : beepStop();
 
     if (diff === 0) tampilkanAdzan(next);
   }
@@ -211,12 +194,14 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateCountdown, 1000);
 
   function selesaiIqomah() {
-    stopBeep();
-    mode = "adzan";
+    beepStop();
+    mode = "NORMAL";
     adzanAktif = false;
+
     document.getElementById("iqomahSection").style.display = "none";
     document.getElementById("normalCountdown").style.display = "block";
   }
+
 
 
   /* ================= JUMAT MODE ================= */
@@ -266,6 +251,22 @@ document.addEventListener("DOMContentLoaded", () => {
       marquee.innerText = pesan[pesanIndex];
       pesanIndex = (pesanIndex + 1) % pesan.length;
     }
-  }, 30000);
+  }, 22240);
+  async function loadSlide() {
+    const res = await fetch("api/slide.php");
+    const data = await res.json();
+
+    let i = 0;
+    setInterval(() => {
+      if (!data.length) return;
+      document.querySelector(".illustration-card").innerHTML = `
+      <h2>${data[i].judul}</h2>
+      <p>${data[i].isi}</p>
+    `;
+      i = (i + 1) % data.length;
+    }, 15000);
+  }
+  loadSlide();
+
 
 });
