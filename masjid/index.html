@@ -1,99 +1,109 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Masjid Al-Ikhlas RSUD Batang</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="mosq.css" />
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap");
-    </style>
-  </head>
 
-  <body>
-    <audio id="beepAudio" src="audio/beep-04.mp3" preload="auto"></audio>
+<head>
+  <meta charset="UTF-8" />
+  <title>Masjid Al-Ikhlas RSUD Batang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="mosq.css" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap");
+  </style>
+</head>
 
-    <div class="main-wrapper">
-      <div class="top-layout">
-        <div class="sidebar-left">
-          <div id="jam" class="current-time"></div>
-          <div class="divider"></div>
+<body>
+  <audio id="beepAudio" src="audio/beep-04.mp3" preload="auto"></audio>
 
-          <div id="iqomahSection" style="display: none">
-            <div class="iqomah-label">Menuju Iqomah</div>
-            <div id="nextSholatCountdown" class="iqomah-timer">00:00</div>
-          </div>
-          
-          <div id="normalCountdown" class="normal-countdown">
-            <div id="nextSholatNama" class="next-sholat-nama"></div>
-            <div id="countdownTimer" class="countdown-timer">00:00:00</div>
-            <div id="nextSholatTime" style="display: none"></div>
-          </div>
+  <div class="main-wrapper">
+    <div class="top-layout">
+      <div class="sidebar-left">
+        <div id="jam" class="current-time"></div>
+        <div class="divider"></div>
+
+        <!-- IMAM -->
+        <div id="imamBox" class="text-center mt-3">
+          <div class="fw-bold fs-4">IMAM</div>
+          <div id="imamNama" class="fs-3 text-success">-</div>
         </div>
 
-        <div class="content-right">
-          <div class="header-info">
-            <div class="masjid-titles">
-              <h1 class="masjid-name">MASJID AL-IKHLAS</h1>
-              <h4 class="masjid-location">RSUD BATANG</h4>
-            </div>
-            <div class="date-box">
-              <div id="tanggal"></div>
-            </div>
-          </div>
+        <!-- IQOMAH SECTION -->
+        <div id="iqomahSection" style="display: none">
+          <div class="iqomah-label">Menuju Iqomah</div>
+          <div id="nextSholatCountdown" class="iqomah-timer">00:00</div>
+        </div>
 
-          <div class="illustration-card">
-            <div id="slideAdzan" class="adzan-overlay" style="display: none">
-              <h1 id="judulAdzan">ADZAN</h1>
-              <p>Mohon bersiap untuk sholat</p>
-            </div>
-
-            <div class="running-text-card">
-              <marquee id="marqueeText">
-                “Demi masa, sesungguhnya manusia dalam kerugian, kecuali orang-orang yang beriman dan beramal saleh serta saling menasihati untuk kebenaran dan kesabaran.” (QS Al-‘Ashr
-                1–3)
-              </marquee>
-            </div>
-          </div>
+        <!-- NORMAL COUNTDOWN -->
+        <div id="normalCountdown" class="normal-countdown">
+          <div id="nextSholatNama" class="next-sholat-nama"></div>
+          <div id="countdownTimer" class="countdown-timer">00:00:00</div>
         </div>
       </div>
 
-      <div class="prayer-grid">
-        <div class="prayer-card" id="imsak">
-          <span>IMSAK</span>
-          <h3>04:07</h3>
+      <div class="content-right">
+        <div class="header-info">
+          <div class="masjid-titles">
+            <h1 class="masjid-name">MASJID AL-IKHLAS</h1>
+            <h4 class="masjid-location">RSUD BATANG</h4>
+          </div>
+          <div class="date-box">
+            <div id="tanggal"></div>
+          </div>
         </div>
-        <div class="prayer-card" id="subuh">
-          <span>SUBUH</span>
-          <h3>04:17</h3>
-        </div>
-        <div class="prayer-card" id="dzuhur">
-          <span>DZUHUR</span>
-          <h3>11:55</h3>
-        </div>
-        <div class="prayer-card" id="ashar">
-          <span>ASHAR</span>
-          <h3>15:18</h3>
-        </div>
-        <div class="prayer-card" id="maghrib">
-          <span>MAGHRIB</span>
-          <h3>18:09</h3>
-        </div>
-        <div class="prayer-card" id="isya">
-          <span>ISYA</span>
-          <h3>19:23</h3>
-        </div>
-      </div>
 
-     <div class="footer-credit">
-        &copy; <span id="tahun"></span> IT RSUD BATANG - SMK SYAFI'I AKROM
+        <div class="illustration-card">
+          <div id="slideAdzan" class="adzan-overlay" style="display: none">
+            <h1 id="judulAdzan">ADZAN</h1>
+            <p>Mohon bersiap untuk sholat</p>
+          </div>
+
+          <div class="running-text-card">
+            <marquee id="marqueeText">
+              “Demi masa, sesungguhnya manusia dalam kerugian, kecuali orang-orang yang beriman dan beramal saleh serta
+              saling menasihati untuk kebenaran dan kesabaran.” (QS Al-‘Ashr 1–3)
+            </marquee>
+          </div>
+        </div>
       </div>
     </div>
 
-    <script src="mosq.js"></script>
-  </body>
+    <!-- GRID SHOLAT -->
+    <div class="prayer-grid">
+      <div class="prayer-card" id="imsak">
+        <span>IMSAK</span>
+        <h3 class="prayer-time">04:07</h3>
+      </div>
+      <div class="prayer-card" id="subuh">
+        <span>SUBUH</span>
+        <h3 class="prayer-time">04:17</h3>
+      </div>
+      <div class="prayer-card" id="dzuhur">
+        <span>DZUHUR</span>
+        <h3 class="prayer-time">11:55</h3>
+      </div>
+      <div class="prayer-card" id="ashar">
+        <span>ASHAR</span>
+        <h3 class="prayer-time">15:18</h3>
+      </div>
+      <div class="prayer-card" id="maghrib">
+        <span>MAGHRIB</span>
+        <h3 class="prayer-time">18:09</h3>
+      </div>
+      <div class="prayer-card" id="isya">
+        <span>ISYA</span>
+        <h3 class="prayer-time">19:23</h3>
+      </div>
+    </div>
+
+    <div class="footer-credit" onclick="window.location.href='mosq/admin/login.php'" style="cursor: pointer;">
+      &copy; <span id="tahun"></span> IT RSUD BATANG - SMK SYAFI'I AKROM
+    </div>
+  </div>
+
+  <script src="mosq.js"></script>
+  <script>
+    document.getElementById('tahun').innerText = new Date().getFullYear();
+  </script>
+</body>
+
 </html>
