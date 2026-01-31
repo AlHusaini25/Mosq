@@ -1,9 +1,82 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* ================= ELEMENT ================= */
+  const jamEl = document.getElementById("jam");
+  const imamNama = document.getElementById("imamNama");
+  const imamBox = document.getElementById("imamBox");
+
+  const slideAdzan = document.getElementById("slideAdzan");
+  const judulAdzan = document.getElementById("judulAdzan");
+
+  const iqomahSection = document.getElementById("iqomahSection");
+  const nextSholatCountdown = document.getElementById("nextSholatCountdown");
+
+  const normalCountdown = document.getElementById("normalCountdown");
+  const nextSholatNama = document.getElementById("nextSholatNama");
+  const countdownTimer = document.getElementById("countdownTimer");
+
   const beepAudio = document.getElementById("beepAudio");
-  beepAudio.volume = 0.7;
+
+
+  /* ================= STATE ================= */
+  let mode = "NORMAL"; // NORMAL | ADZAN | IQOMAH
+  let iqomahTarget = null;
+  let jadwalHariIni = {};
   let beepInterval = null;
 
+  /* ================= KONFIG ================= */
+  const IQOMAH = {
+    subuh: 1,
+    dzuhur: 8,
+    ashar: 8,
+    maghrib: 5,
+    isya: 8
+  };
+
+  /* ================= UI MODE ================= */
+  function setMode(newMode) {
+    mode = newMode;
+
+    const slideAdzan = document.getElementById("slideAdzan");
+    const iqomah = document.getElementById("iqomahSection");
+    const normal = document.getElementById("normalCountdown");
+    const imam = document.getElementById("imamBox");
+
+    // reset semua
+    slideAdzan.style.display = "none";
+    iqomah.style.display = "none";
+    normal.style.display = "none";
+    imam.style.display = "none"; 
+
+    if (newMode === "NORMAL") {
+      normal.style.display = "block";
+    }
+
+    if (newMode === "ADZAN") {
+      slideAdzan.style.display = "flex";
+      imam.style.display = "block"; 
+    }
+
+    if (newMode === "IQOMAH") {
+      iqomah.style.display = "block";
+      imam.style.display = "block"; 
+    }
+  }
+
+
+  setMode("NORMAL");
+
+  /* ================= JAM ================= */
+  function updateJam() {
+    jamEl.innerText = new Date().toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+  setInterval(updateJam, 1000);
+  updateJam();
+
+  /* ================= BEEP ================= */
   function beepStart() {
     if (beepInterval) return;
     beepInterval = setInterval(() => {
@@ -17,29 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     beepInterval = null;
   }
 
-  // ================= JAM & TANGGAL =================
-  function updateJam() {
-    const now = new Date();
-    document.getElementById("jam").innerText =
-      now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-  }
-  setInterval(updateJam, 1000);
-  updateJam();
-
-  fetch("https://api.aladhan.com/v1/gToH")
-    .then(r => r.json())
-    .then(h => {
-      const masehi = new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-      document.getElementById("tanggal").innerHTML = `${masehi}<br>${h.data.hijri.day} ${h.data.hijri.month.en} ${h.data.hijri.year} H`;
-    });
-
-  // ================= JADWAL SHOLAT =================
-  let jadwalHariIni = {};
-  let mode = "NORMAL"; // NORMAL | ADZAN | IQOMAH
-  let iqomahTarget = null;
-
-  const IQOMAH = { subuh: 0.3, dzuhur: 8, ashar: 8, maghrib: 5, isya: 8 };
-
+  /* ================= JADWAL SHOLAT ================= */
   async function ambilJadwal() {
     const d = new Date();
     const y = d.getFullYear();
@@ -47,14 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const t = String(d.getDate()).padStart(2, "0");
 
     try {
-      const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/1403/${y}/${m}/${t}`);
-      const data = await res.json();
-      if (data.status) {
-        jadwalHariIni = data.data.jadwal;
-        ["imsak", "subuh", "dzuhur", "ashar", "maghrib", "isya"].forEach(s => {
-          const el = document.querySelector(`#${s} .prayer-time`);
-          if (el) el.innerText = jadwalHariIni[s];
-        });
+      const res = await fetch(
+        `https://api.myquran.com/v2/sholat/jadwal/1403/${y}/${m}/${t}`
+      );
+      const json = await res.json();
+      if (json.status) {
+        jadwalHariIni = json.data.jadwal;
       }
     } catch (e) {
       console.error("Gagal ambil jadwal", e);
@@ -64,14 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
   ambilJadwal();
   setInterval(ambilJadwal, 3600000);
 
-  // ================= HIGHLIGHT =================
+  /* ================= HIGHLIGHT ================= */
   function clearHighlight() {
-    document.querySelectorAll(".prayer-card").forEach(el => el.classList.remove("next", "active"));
-  }
-
-  function highlightNext(sholat) {
-    clearHighlight();
-    document.getElementById(sholat)?.classList.add("next");
+    document
+      .querySelectorAll(".prayer-card")
+      .forEach(el => el.classList.remove("next", "active"));
   }
 
   function highlightActive(sholat) {
@@ -79,62 +125,64 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(sholat)?.classList.add("active");
   }
 
-  // ================= ADZAN =================
+  function highlightNext(sholat) {
+    clearHighlight();
+    document.getElementById(sholat)?.classList.add("next");
+  }
+
+  /* ================= IMAM ================= */
+  async function loadImam(sholat) {
+    try {
+      const res = await fetch(`api/imam.php?sholat=${sholat}`);
+      const data = await res.json();
+      imamNama.innerText = data.imam ?? "-";
+    } catch {
+      imamNama.innerText = "-";
+    }
+  }
+
+  /* ================= ADZAN ================= */
   function tampilkanAdzan(sholat) {
-    mode = "ADZAN";
+    setMode("ADZAN");
     beepStop();
+
     highlightActive(sholat);
+    judulAdzan.innerText = "ADZAN " + sholat.toUpperCase();
 
-    document.getElementById("slideAdzan").style.display = "flex";
-    document.getElementById("judulAdzan").innerText = "ADZAN " + sholat.toUpperCase();
-
-    document.getElementById("normalCountdown").style.display = "none";
-    document.getElementById("iqomahSection").style.display = "none";
-
-    // tampilkan nama imam
-    updateImam(sholat);
+    loadImam(sholat);
 
     setTimeout(() => {
-      document.getElementById("slideAdzan").style.display = "none";
       mulaiIqomah(sholat);
     }, 15000);
   }
+
   window.testAdzan = tampilkanAdzan;
 
-  // ================= IQOMAH =================
+  /* ================= IQOMAH ================= */
   function mulaiIqomah(sholat) {
-    mode = "IQOMAH";
-    iqomahTarget = new Date(Date.now() + (IQOMAH[sholat] || 10) * 60000);
-    document.getElementById("iqomahSection").style.display = "flex";
-    document.getElementById("normalCountdown").style.display = "none";
-    highlightActive(sholat);
+    setMode("IQOMAH");
+    iqomahTarget = new Date(Date.now() + IQOMAH[sholat] * 60000);
   }
 
   function selesaiIqomah() {
     beepStop();
-    mode = "NORMAL";
     iqomahTarget = null;
+    setMode("NORMAL");
 
-    // hide iqomah, show normal countdown
-    document.getElementById("iqomahSection").style.display = "none";
-    document.getElementById("normalCountdown").style.display = "flex";
-
-    // hilangkan nama imam
-    document.getElementById("imamNama").innerText = "-";
-
-    // refresh countdown normal
-    updateCountdown();
+    // refresh bersih biar 100% rapi
+    setTimeout(() => location.reload(), 800);
   }
 
-  // ================= COUNTDOWN UTAMA =================
+  /* ================= COUNTDOWN ================= */
   function updateCountdown() {
     const now = new Date();
 
+    // IQOMAH
     if (mode === "IQOMAH" && iqomahTarget) {
-      let diff = Math.max(0, Math.floor((iqomahTarget - now) / 1000));
-      const m = String(Math.floor(diff / 60)).padStart(2, "0");
-      const s = String(diff % 60).padStart(2, "0");
-      document.getElementById("nextSholatCountdown").innerText = `${m}:${s}`;
+      const diff = Math.max(0, Math.floor((iqomahTarget - now) / 1000));
+      nextSholatCountdown.innerText =
+        `${String(Math.floor(diff / 60)).padStart(2, "0")}:${String(diff % 60).padStart(2, "0")}`;
+
       diff <= 10 && diff > 0 ? beepStart() : beepStop();
       if (diff === 0) selesaiIqomah();
       return;
@@ -144,41 +192,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const urutan = ["subuh", "dzuhur", "ashar", "maghrib", "isya"];
-    let next = urutan.find(s => {
-      const [h, m] = jadwalHariIni[s].split(":").map(Number);
-      return nowMin < h * 60 + m;
-    }) || "subuh";
 
-    // highlight waktu sholat saat ini
-    clearHighlight();
-    document.getElementById(next)?.classList.add("next");
+    let next =
+      urutan.find(s => {
+        const [h, m] = jadwalHariIni[s].split(":").map(Number);
+        return nowMin < h * 60 + m;
+      }) || "subuh";
 
-    const [nh, nm] = jadwalHariIni[next].split(":").map(Number);
+    highlightNext(next);
+
+    const [h, m] = jadwalHariIni[next].split(":").map(Number);
     const target = new Date();
-    target.setHours(nh, nm, 0, 0);
+    target.setHours(h, m, 0, 0);
     if (next === "subuh" && nowMin > 1200) target.setDate(target.getDate() + 1);
 
-    const diff = Math.max(0, Math.floor((target - now) / 1000));
-    document.getElementById("countdownTimer").innerText =
+    const diff = Math.floor((target - now) / 1000);
+    countdownTimer.innerText =
       new Date(diff * 1000).toISOString().substr(11, 8);
-    document.getElementById("nextSholatNama").innerText = "MENUJU " + next.toUpperCase();
+
+    nextSholatNama.innerText = "MENUJU " + next.toUpperCase();
 
     diff <= 60 && diff > 0 ? beepStart() : beepStop();
-
     if (diff === 0) tampilkanAdzan(next);
   }
-  setInterval(updateCountdown, 1000);
 
-  // ================= IMAM =================
-  async function updateImam(sholat) {
-    try {
-      const res = await fetch("api/imam.php?sholat=" + sholat);
-      const data = await res.json();
-      document.getElementById("imamNama").innerText = data.imam ?? "-";
-    } catch (err) {
-      console.error("Gagal load imam", err);
-      document.getElementById("imamNama").innerText = "-";
-    }
-  }
-  window.updateImam = updateImam;
+  setInterval(updateCountdown, 1000);
 });
