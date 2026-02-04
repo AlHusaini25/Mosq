@@ -198,3 +198,35 @@ body {
     opacity: 0.3;
   }
 }
+
+.status-waktu {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  animation: pulse 2s infinite;
+  text-align: center;
+}
+
+.status-waktu.belum {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-waktu.masuk {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-waktu.iqomah {
+  background: #fff8e1;
+  color: #ef6c00;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: .6; }
+  100% { opacity: 1; }
+}

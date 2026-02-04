@@ -2,8 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= ELEMENT ================= */
   const jamEl = document.getElementById("jam");
-  const imamNama = document.getElementById("imamNama");
+  const statusWaktu = document.getElementById("statusWaktu");
+
   const imamBox = document.getElementById("imamBox");
+  const imamNama = document.getElementById("imamNama");
 
   const slideAdzan = document.getElementById("slideAdzan");
   const judulAdzan = document.getElementById("judulAdzan");
@@ -16,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const countdownTimer = document.getElementById("countdownTimer");
 
   const beepAudio = document.getElementById("beepAudio");
-
 
   /* ================= STATE ================= */
   let mode = "NORMAL"; // NORMAL | ADZAN | IQOMAH
@@ -33,36 +34,52 @@ document.addEventListener("DOMContentLoaded", () => {
     isya: 8
   };
 
-  /* ================= UI MODE ================= */
+  /* ================= STATUS WAKTU ================= */
+  function setStatus(type) {
+    statusWaktu.className = "status-waktu";
+
+    if (type === "BELUM") {
+      statusWaktu.classList.add("belum");
+      statusWaktu.innerText = "● BELUM MASUK WAKTU";
+    }
+
+    if (type === "MASUK") {
+      statusWaktu.classList.add("masuk");
+      statusWaktu.innerText = "● SUDAH MASUK WAKTU";
+    }
+
+    if (type === "IQOMAH") {
+      statusWaktu.classList.add("iqomah");
+      statusWaktu.innerText = "● MENUJU IQOMAH";
+    }
+  }
+
+  /* ================= MODE UI ================= */
   function setMode(newMode) {
     mode = newMode;
 
-    const slideAdzan = document.getElementById("slideAdzan");
-    const iqomah = document.getElementById("iqomahSection");
-    const normal = document.getElementById("normalCountdown");
-    const imam = document.getElementById("imamBox");
-
-    // reset semua
     slideAdzan.style.display = "none";
-    iqomah.style.display = "none";
-    normal.style.display = "none";
-    imam.style.display = "none"; 
+    iqomahSection.style.display = "none";
+    normalCountdown.style.display = "none";
+    imamBox.style.display = "none";
 
     if (newMode === "NORMAL") {
-      normal.style.display = "block";
+      normalCountdown.style.display = "block";
+      setStatus("BELUM");
     }
 
     if (newMode === "ADZAN") {
       slideAdzan.style.display = "flex";
-      imam.style.display = "block"; 
+      imamBox.style.display = "block";
+      setStatus("MASUK");
     }
 
     if (newMode === "IQOMAH") {
-      iqomah.style.display = "block";
-      imam.style.display = "block"; 
+      iqomahSection.style.display = "block";
+      imamBox.style.display = "block";
+      setStatus("IQOMAH");
     }
   }
-
 
   setMode("NORMAL");
 
@@ -81,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (beepInterval) return;
     beepInterval = setInterval(() => {
       beepAudio.currentTime = 0;
-      beepAudio.play().catch(() => { });
+      beepAudio.play().catch(() => {});
     }, 2500);
   }
 
@@ -102,9 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `https://api.myquran.com/v2/sholat/jadwal/1403/${y}/${m}/${t}`
       );
       const json = await res.json();
-      if (json.status) {
-        jadwalHariIni = json.data.jadwal;
-      }
+      if (json.status) jadwalHariIni = json.data.jadwal;
     } catch (e) {
       console.error("Gagal ambil jadwal", e);
     }
@@ -148,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     highlightActive(sholat);
     judulAdzan.innerText = "ADZAN " + sholat.toUpperCase();
-
     loadImam(sholat);
 
     setTimeout(() => {
@@ -169,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     iqomahTarget = null;
     setMode("NORMAL");
 
-    // refresh bersih biar 100% rapi
+    // refresh bersih (TV-safe)
     setTimeout(() => location.reload(), 800);
   }
 
